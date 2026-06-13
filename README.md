@@ -8,23 +8,22 @@ A multi-threaded AI chat application where each conversation thread is visually 
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | FastAPI + Uvicorn |
+| App | Streamlit |
 | Database | SQLite + SQLAlchemy |
-| Frontend | Streamlit |
 | LLM | Groq (Llama 3.3 70B) |
 
 ## How It Works
 
 - **UI & Storage Isolation**: Messages are stored per-thread. The UI only displays messages belonging to the selected thread.
-- **Universal LLM Context**: When generating a response, the backend fetches **all messages from all threads**, constructs a chronological global context, and sends it to the LLM — giving the AI perfect cross-thread memory.
+- **Universal LLM Context**: When generating a response, the app fetches **all messages from all threads**, constructs a chronological global context, and sends it to the LLM — giving the AI perfect cross-thread memory.
 
 ## Setup
 
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/<your-username>/askfirst.git
-cd askfirst
+git clone https://github.com/RythmaLakkady/minichatbot.git
+cd minichatbot
 pip install -r requirements.txt
 ```
 
@@ -39,26 +38,30 @@ Get a free API key at [console.groq.com](https://console.groq.com).
 
 ### 3. Run
 
-Start the backend:
 ```bash
-python -m uvicorn main:app --host 127.0.0.1 --port 8000
-```
-
-Start the frontend (in a second terminal):
-```bash
-python -m streamlit run app.py
+streamlit run app.py
 ```
 
 Open **http://localhost:8501** in your browser.
+
+## Deploy on Streamlit Community Cloud
+
+1. Push this repo to GitHub.
+2. Go to [share.streamlit.io](https://share.streamlit.io) and connect your repo.
+3. Set the main file to `app.py`.
+4. Add your `GROQ_API_KEY` under **Advanced settings → Secrets**:
+   ```toml
+   GROQ_API_KEY = "gsk_your_key_here"
+   ```
+5. Deploy!
 
 ## Project Structure
 
 ```
 askfirst/
-├── main.py           # FastAPI backend (4 endpoints + Groq LLM)
+├── app.py            # Self-contained Streamlit app (UI + DB + LLM)
 ├── database.py       # SQLAlchemy models (Thread, Message)
-├── app.py            # Streamlit frontend (dark glassmorphism UI)
-├── requirements.txt  # Pinned dependencies
+├── requirements.txt  # Dependencies
 ├── .env.example      # API key template
 └── .gitignore
 ```

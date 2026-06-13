@@ -1,8 +1,4 @@
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-sqlalchemy==2.0.36
-pydantic==2.10.3
-python-dotenv==1.0.1
-groq==0.25.0
 streamlit==1.41.1
-requests==2.32.3
+sqlalchemy==2.0.36
+groq==0.25.0
+python-dotenv==1.0.1

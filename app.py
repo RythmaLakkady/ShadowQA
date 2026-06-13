@@ -1,18 +1,58 @@
 """
-app.py — Streamlit frontend for AskFirst.
-Run with:  streamlit run app.py
+app.py — AskFirst: Self-contained Streamlit app with universal memory.
+Deploy directly on Streamlit Community Cloud.
+Run locally:  streamlit run app.py
 """
 
 from __future__ import annotations
 
-import requests
+import os
+from datetime import datetime, timezone
+
 import streamlit as st
+from groq import Groq
+from sqlalchemy import asc
+from sqlalchemy.orm import Session
+
+from database import Message, Thread, SessionLocal, init_db
 
 # ---------------------------------------------------------------------------
-# Config
+# Init DB on first import
+# ---------------------------------------------------------------------------
+init_db()
+
+# ---------------------------------------------------------------------------
+# Groq client (reads from st.secrets on Cloud, .env locally)
 # ---------------------------------------------------------------------------
 
-API_BASE = "http://127.0.0.1:8000"
+def _get_groq_key() -> str:
+    """Resolve GROQ_API_KEY from Streamlit secrets (cloud) or env var (local)."""
+    try:
+        return st.secrets["GROQ_API_KEY"]
+    except (FileNotFoundError, KeyError):
+        from dotenv import load_dotenv
+        load_dotenv()
+        key = os.getenv("GROQ_API_KEY", "")
+        if not key:
+            st.error("🔑 GROQ_API_KEY not set. Add it to `.streamlit/secrets.toml` or `.env`.")
+            st.stop()
+        return key
+
+
+_client = Groq(api_key=_get_groq_key())
+_MODEL = "llama-3.3-70b-versatile"
+
+SYSTEM_INSTRUCTION = (
+    "You are a helpful, concise AI assistant called AskFirst. "
+    "You have access to the user's ENTIRE conversation history across all threads. "
+    "Use this global memory to maintain continuity — if the user told you their name "
+    "in a previous thread, remember it. Always be accurate, friendly, and brief."
+)
+
+
+# ---------------------------------------------------------------------------
+# Page config
+# ---------------------------------------------------------------------------
 
 st.set_page_config(
     page_title="AskFirst — AI Chat",
@@ -20,6 +60,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
 
 # ---------------------------------------------------------------------------
 # Custom CSS — premium dark glassmorphism aesthetic
@@ -136,35 +177,101 @@ st.markdown(
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Data helpers (direct DB calls, no HTTP)
 # ---------------------------------------------------------------------------
 
-def api_get(path: str):
-    """GET request to the FastAPI backend."""
+def create_thread() -> dict:
+    """Create a new thread and return its id + title."""
+    db: Session = SessionLocal()
     try:
-        r = requests.get(f"{API_BASE}{path}", timeout=10)
-        r.raise_for_status()
-        return r.json()
-    except requests.ConnectionError:
-        st.error("🔌 Cannot reach the backend. Is `uvicorn main:app` running?")
-        st.stop()
-    except requests.HTTPError as exc:
-        st.error(f"API error: {exc.response.status_code} — {exc.response.text}")
-        st.stop()
+        now = datetime.now(timezone.utc)
+        thread = Thread(title=f"Thread {now.strftime('%b %d, %H:%M')}", created_at=now)
+        db.add(thread)
+        db.commit()
+        db.refresh(thread)
+        return {"id": thread.id, "title": thread.title}
+    finally:
+        db.close()
 
 
-def api_post(path: str, json: dict | None = None):
-    """POST request to the FastAPI backend."""
+def list_threads() -> list[dict]:
+    """Return all threads, newest first."""
+    db: Session = SessionLocal()
     try:
-        r = requests.post(f"{API_BASE}{path}", json=json, timeout=120)
-        r.raise_for_status()
-        return r.json()
-    except requests.ConnectionError:
-        st.error("🔌 Cannot reach the backend. Is `uvicorn main:app` running?")
-        st.stop()
-    except requests.HTTPError as exc:
-        st.error(f"API error: {exc.response.status_code} — {exc.response.text}")
-        st.stop()
+        rows = db.query(Thread).order_by(Thread.created_at.desc()).all()
+        return [{"id": t.id, "title": t.title} for t in rows]
+    finally:
+        db.close()
+
+
+def get_thread_messages(thread_id: int) -> list[dict]:
+    """Return messages for a specific thread."""
+    db: Session = SessionLocal()
+    try:
+        rows = (
+            db.query(Message)
+            .filter(Message.thread_id == thread_id)
+            .order_by(asc(Message.created_at))
+            .all()
+        )
+        return [{"role": m.role, "content": m.content} for m in rows]
+    finally:
+        db.close()
+
+
+def chat(thread_id: int, user_text: str) -> str:
+    """
+    Save user message, build universal context, call Groq, save reply.
+    Returns the assistant's reply text.
+    """
+    db: Session = SessionLocal()
+    try:
+        # Persist user message
+        db.add(Message(
+            thread_id=thread_id,
+            role="user",
+            content=user_text,
+            created_at=datetime.now(timezone.utc),
+        ))
+        db.commit()
+
+        # Build universal context from ALL threads
+        all_msgs = db.query(Message).order_by(asc(Message.created_at)).all()
+
+        groq_messages: list[dict] = [
+            {"role": "system", "content": SYSTEM_INSTRUCTION}
+        ]
+        for msg in all_msgs:
+            role = "user" if msg.role == "user" else "assistant"
+            groq_messages.append({
+                "role": role,
+                "content": f"[Thread {msg.thread_id}] {msg.content}",
+            })
+
+        # Call Groq
+        try:
+            response = _client.chat.completions.create(
+                model=_MODEL,
+                messages=groq_messages,
+                temperature=0.7,
+                max_tokens=2048,
+            )
+            reply_text = response.choices[0].message.content.strip()
+        except Exception as exc:
+            reply_text = f"⚠️ LLM error: {exc}"
+
+        # Persist assistant reply
+        db.add(Message(
+            thread_id=thread_id,
+            role="assistant",
+            content=reply_text,
+            created_at=datetime.now(timezone.utc),
+        ))
+        db.commit()
+
+        return reply_text
+    finally:
+        db.close()
 
 
 # ---------------------------------------------------------------------------
@@ -186,25 +293,24 @@ with st.sidebar:
 
     # -- New Chat button --
     if st.button("＋  New Chat", use_container_width=True, type="primary"):
-        new_thread = api_post("/threads")
+        new_thread = create_thread()
         st.session_state.current_thread_id = new_thread["id"]
         st.rerun()
 
     st.divider()
     st.markdown("##### History")
 
-    threads = api_get("/threads")
+    threads = list_threads()
 
     if not threads:
         st.caption("No conversations yet.")
     else:
         for t in threads:
             is_active = st.session_state.current_thread_id == t["id"]
-            container_class = "active-thread" if is_active else ""
             with st.container():
                 if is_active:
                     st.markdown(
-                        f'<div class="active-thread">',
+                        '<div class="active-thread">',
                         unsafe_allow_html=True,
                     )
                 if st.button(
@@ -241,7 +347,7 @@ if current_tid is None:
     )
 else:
     # -- Fetch & render thread messages --
-    messages = api_get(f"/threads/{current_tid}/messages")
+    messages = get_thread_messages(current_tid)
 
     for msg in messages:
         with st.chat_message(msg["role"]):
@@ -253,14 +359,11 @@ else:
         with st.chat_message("user"):
             st.markdown(user_input)
 
-        # Call backend (shows spinner while waiting)
+        # Call Groq directly (shows spinner while waiting)
         with st.chat_message("assistant"):
             with st.spinner("Thinking…"):
-                result = api_post(
-                    f"/threads/{current_tid}/chat",
-                    json={"message": user_input},
-                )
-            st.markdown(result["reply"])
+                reply = chat(current_tid, user_input)
+            st.markdown(reply)
 
         # Rerun to refresh full message list from DB
         st.rerun()
