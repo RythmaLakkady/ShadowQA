@@ -17,6 +17,17 @@ from sqlalchemy.orm import Session
 from database import Message, Thread, SessionLocal, init_db
 
 # ---------------------------------------------------------------------------
+# Page config
+# ---------------------------------------------------------------------------
+
+st.set_page_config(
+    page_title="AskFirst — AI Chat",
+    page_icon="🧠",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ---------------------------------------------------------------------------
 # Init DB on first import
 # ---------------------------------------------------------------------------
 init_db()
@@ -47,18 +58,6 @@ SYSTEM_INSTRUCTION = (
     "You have access to the user's ENTIRE conversation history across all threads. "
     "Use this global memory to maintain continuity — if the user told you their name "
     "in a previous thread, remember it. Always be accurate, friendly, and brief."
-)
-
-
-# ---------------------------------------------------------------------------
-# Page config
-# ---------------------------------------------------------------------------
-
-st.set_page_config(
-    page_title="AskFirst — AI Chat",
-    page_icon="🧠",
-    layout="wide",
-    initial_sidebar_state="expanded",
 )
 
 
