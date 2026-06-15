@@ -25,8 +25,8 @@ An AI-driven Automated API Chaos Testing Engine. Instead of relying on manual QA
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/RythmaLakkady/minichatbot.git
-cd minichatbot
+git clone https://github.com/RythmaLakkady/ShadowQA.git
+cd ShadowQA
 pip install -r requirements.txt
 ```
 
