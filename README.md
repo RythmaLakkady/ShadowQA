@@ -1,21 +1,24 @@
-# 🧠 AskFirst — AI Chat with Universal Memory
+# 🎯 ShadowQA — Universal API Chaos Agent
 
-A multi-threaded AI chat application where each conversation thread is visually isolated, but the AI maintains **universal memory across all threads**.
-
-> Tell the AI your name in Thread 1 → Start Thread 2 (blank UI) → The AI still remembers your name.
+An AI-driven Automated API Chaos Testing Engine. Instead of relying on manual QA scripts to uncover boundary errors and validation exploits, ShadowQA leverages High-Throughput LLMs to parse endpoint requirements, construct malicious test vectors, execute live payloads, and audit structural system stability.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | App | Streamlit |
-| Database | SQLite + SQLAlchemy |
-| LLM | Groq (Llama 3.3 70B) |
+| Database | SQLite |
+| LLM | Groq (Llama 3.3 70B Versatile) |
 
-## How It Works
+## Features
 
-- **UI & Storage Isolation**: Messages are stored per-thread. The UI only displays messages belonging to the selected thread.
-- **Universal LLM Context**: When generating a response, the app fetches **all messages from all threads**, constructs a chronological global context, and sends it to the LLM — giving the AI perfect cross-thread memory.
+- **Automated AI Generation Matrix**: Provide an API Endpoint URL, Method, and Schema Description. The AI will automatically generate exact structured test vectors split across:
+  - **Happy Path**: Clean data expecting 200/201 success codes.
+  - **Edge Case**: Boundary testing, negative indexes, missing keys expecting 400.
+  - **Chaos Path**: Malicious payloads, SQL injections, and type coercion threats.
+- **Secure Authentication Layer**: Built-in user registration and login system.
+- **Live Auditing & Execution Engine**: Fires the test vectors sequentially against the target endpoint and tracks network latency, HTTP status codes, and determines vulnerability (e.g., data leaks, unhandled crashes).
+- **Historical Vulnerability Audits**: Persistent history tracking using SQLite to see pass/fail rates across sessions.
 
 ## Setup
 
@@ -44,23 +47,11 @@ streamlit run app.py
 
 Open **http://localhost:8501** in your browser.
 
-## Deploy on Streamlit Community Cloud
-
-1. Push this repo to GitHub.
-2. Go to [share.streamlit.io](https://share.streamlit.io) and connect your repo.
-3. Set the main file to `app.py`.
-4. Add your `GROQ_API_KEY` under **Advanced settings → Secrets**:
-   ```toml
-   GROQ_API_KEY = "gsk_your_key_here"
-   ```
-5. Deploy!
-
 ## Project Structure
 
 ```
 askfirst/
-├── app.py            # Self-contained Streamlit app (UI + DB + LLM)
-├── database.py       # SQLAlchemy models (Thread, Message)
+├── app.py            # Self-contained Streamlit application (UI + Logic)
 ├── requirements.txt  # Dependencies
 ├── .env.example      # API key template
 └── .gitignore
