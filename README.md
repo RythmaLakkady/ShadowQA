@@ -215,6 +215,3 @@ MIT
 
 [RythmaLakkady](https://github.com/RythmaLakkady)
 
----
-
-**For questions or issues, please open a GitHub issue or contact the maintainers.**
