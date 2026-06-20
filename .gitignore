@@ -25,3 +25,7 @@ Thumbs.db
 
 # Streamlit
 .streamlit/
+
+.env
+shadowqa.db
+__pycache__/
