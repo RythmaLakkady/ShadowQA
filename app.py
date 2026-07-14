@@ -30,8 +30,13 @@ groq_client = initialize_system()
 # 3. Session State Management (The memory bridge between tabs)
 if "user_id" not in st.session_state:
     st.session_state.user_id = None
+
 if "generated_tests" not in st.session_state:
     st.session_state.generated_tests = []
+
+if "executed_results" not in st.session_state:
+    st.session_state.executed_results = None
+
 if "last_execution_error" not in st.session_state:
     st.session_state.last_execution_error = ""
 
