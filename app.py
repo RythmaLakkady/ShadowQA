@@ -5,6 +5,9 @@ from groq import Groq
 
 load_dotenv()
 
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+st.write(GROQ_API_KEY is not None)
+
 from database.db import *
 from core.llm_engine import generate_test_vectors
 from core.test_runner import run_tests
