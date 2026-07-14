@@ -3,15 +3,43 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-from database.db import init_db
-from ui.tabs import render_chaos_console
+st.set_page_config(page_title="ShadowQA Diagnostic")
 
-st.set_page_config(page_title="Chaos Test")
+st.write("✅ STEP 1 - Streamlit started")
 
+# ----------------------------
+# Environment
+# ----------------------------
 load_dotenv()
+st.write("✅ STEP 2 - dotenv loaded")
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+st.write(f"✅ STEP 3 - API key exists: {bool(GROQ_API_KEY)}")
 
+# ----------------------------
+# Imports
+# ----------------------------
+from database.db import (
+    init_db,
+    authenticate_user,
+    register_user,
+)
+
+st.write("✅ STEP 4 - database imported")
+
+from ui.tabs import (
+    render_onboarding_hub,
+    render_chaos_console,
+    render_root_cause_analyzer,
+    render_coverage_analyzer,
+    render_history_audit,
+)
+
+st.write("✅ STEP 5 - ui.tabs imported")
+
+# ----------------------------
+# Initialize
+# ----------------------------
 @st.cache_resource
 def initialize_system():
     init_db()
@@ -19,15 +47,40 @@ def initialize_system():
 
 groq_client = initialize_system()
 
-st.session_state.user_id = 1
+st.write("✅ STEP 6 - initialize_system completed")
 
-st.write("Before chaos")
+# ----------------------------
+# Session State
+# ----------------------------
+if "user_id" not in st.session_state:
+    st.session_state.user_id = None
 
-render_chaos_console(GROQ_API_KEY)
+if "generated_tests" not in st.session_state:
+    st.session_state.generated_tests = []
 
-st.write("After chaos")
+if "last_execution_error" not in st.session_state:
+    st.session_state.last_execution_error = ""
 
-st.success("Chaos finished")
+st.write("✅ STEP 7 - session state initialized")
+
+# ----------------------------
+# Authentication UI
+# ----------------------------
+def render_auth():
+    st.title("🔐 Login Test")
+
+    l_user = st.text_input("Username")
+    l_pass = st.text_input("Password", type="password")
+
+    st.write("✅ render_auth executed")
+
+st.write("✅ STEP 8 - about to choose route")
+
+if st.session_state.user_id is None:
+    render_auth()
+    st.write("✅ STEP 9 - auth page rendered")
+else:
+    st.write("Logged in")
 
 
 
