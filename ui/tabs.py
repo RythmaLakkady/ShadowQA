@@ -88,7 +88,7 @@ def render_chaos_console(backend_api_key):
                     m2.metric("Vulnerability Defect Rate", f"{step['vulnerability_rate']}%", delta=f"{step['failures_count']} Issues Detected", delta_color="inverse")
                     m3.metric("Average Response Latency", f"{step['avg_latency']} ms")
                     
-                    st.dataframe(step['executed_results'], use_container_width=True)
+                    st.write(step["executed_results"])
                     
                     # --- AUTO-DEBUG BRIDGE INITIALIZATION ---
                     # If failures were detected, isolate the first critical anomaly and pass it to the RAG analyzer session state
