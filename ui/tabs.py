@@ -228,9 +228,7 @@ def render_chaos_console(backend_api_key):
                 f"{results['avg_latency']} ms",
             )
 
-            st.dataframe(
-                results["executed_results"],
-                use_container_width=True,
+            st.json(results["executed_results"])
             )
 
 def render_root_cause_analyzer(groq_client):
