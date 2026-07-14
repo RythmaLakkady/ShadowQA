@@ -230,12 +230,15 @@ def render_chaos_console(backend_api_key):
                 f"{results['avg_latency']} ms",
             )
 
-            display_df = pd.DataFrame(st.session_state.generated_tests)
-            display_df["payload"] = display_df["payload"].apply(
-            lambda x: json.dumps(x, indent=2)
-)
+            display_results = pd.DataFrame(results["executed_results"])
 
-st.dataframe(display_df, use_container_width=True)
+            display_results["payload"] = display_results["payload"].astype(str)
+            display_results["response_body"] = display_results["response_body"].astype(str)
+            
+            st.dataframe(
+                display_results,
+                use_container_width=True,
+            )
 
 def render_root_cause_analyzer(groq_client):
     st.title("🧠 AI Root Cause Analyzer")
