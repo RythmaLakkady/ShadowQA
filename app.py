@@ -3,7 +3,8 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-from database.db import init_db, authenticate_user, register_user
+from database.db import init_db
+from ui.tabs import render_onboarding_hub
 
 st.set_page_config(page_title="Test")
 
@@ -14,24 +15,20 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 @st.cache_resource
 def initialize_system():
     init_db()
-    return Groq(api_key=GROQ_API_KEY)
+    return Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 groq_client = initialize_system()
 
-if "user_id" not in st.session_state:
-    st.session_state.user_id = None
+# Fake login
+st.session_state.user_id = 1
 
+st.write("Before onboarding")
 
-def render_auth():
-    st.title("Login Test")
-    st.text_input("Username")
-    st.text_input("Password", type="password")
+render_onboarding_hub(GROQ_API_KEY)
 
+st.write("After onboarding")
 
-render_auth()
-
-st.success("render_auth finished")
-
+st.success("Onboarding finished")
 
 # import streamlit as st
 # import os
