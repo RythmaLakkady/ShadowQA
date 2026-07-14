@@ -3,249 +3,100 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-st.set_page_config(page_title="ShadowQA Diagnostic")
-
-st.write("✅ STEP 1 - Streamlit started")
-
-# ----------------------------
-# Environment
-# ----------------------------
-load_dotenv()
-st.write("✅ STEP 2 - dotenv loaded")
-
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-st.write(f"✅ STEP 3 - API key exists: {bool(GROQ_API_KEY)}")
-
-# ----------------------------
-# Imports
-# ----------------------------
-from database.db import (
-    init_db,
-    authenticate_user,
-    register_user,
-)
-
-st.write("✅ STEP 4 - database imported")
-
+# Import our newly modularized components
+from database.db import init_db, authenticate_user, register_user
 from ui.tabs import (
     render_onboarding_hub,
     render_chaos_console,
     render_root_cause_analyzer,
     render_coverage_analyzer,
-    render_history_audit,
+    render_history_audit
 )
 
-st.write("✅ STEP 5 - ui.tabs imported")
+# 1. Page Configuration (Must be the absolute first Streamlit command)
+st.set_page_config(page_title="ShadowQA Suite", page_icon="🕵️", layout="wide")
 
-# ----------------------------
-# Initialize
-# ----------------------------
+# 2. Environment & Database Initialization
+load_dotenv()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
 @st.cache_resource
 def initialize_system():
-    init_db()
+    init_db()  # Creates the SQLite file and tables if they don't exist
     return Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 groq_client = initialize_system()
 
-st.write("✅ STEP 6 - initialize_system completed")
-
-# ----------------------------
-# Session State
-# ----------------------------
+# 3. Session State Management (The memory bridge between tabs)
 if "user_id" not in st.session_state:
     st.session_state.user_id = None
-
 if "generated_tests" not in st.session_state:
     st.session_state.generated_tests = []
-
 if "last_execution_error" not in st.session_state:
     st.session_state.last_execution_error = ""
 
-st.write("✅ STEP 7 - session state initialized")
-
-# ----------------------------
-# Authentication UI
-# ----------------------------
+# 4. Authentication Barrier (Acts as your ui/auth.py component)
 def render_auth():
-    st.title("🔐 Login Test")
+    st.title("🔐 ShadowQA Security Gateway")
+    st.write("---")
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        tab1, tab2 = st.tabs(["Operator Login", "Request Clearance (Register)"])
+        
+        with tab1:
+            l_user = st.text_input("Username", key="login_user")
+            l_pass = st.text_input("Password", type="password", key="login_pass")
+            if st.button("Authenticate", use_container_width=True):
+                user_id = authenticate_user(l_user, l_pass)
+                if user_id:
+                    st.session_state.user_id = user_id
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials. Access denied.")
+                    
+        with tab2:
+            r_user = st.text_input("New Username", key="reg_user")
+            r_pass = st.text_input("New Password", type="password", key="reg_pass")
+            if st.button("Register Identity", use_container_width=True):
+                if r_user and r_pass:
+                    if register_user(r_user, r_pass):
+                        st.success("Identity registered! You may now switch to the Login tab.")
+                    else:
+                        st.error("Username already exists in the system registry.")
+                else:
+                    st.warning("Please provide both a username and password.")
 
-    l_user = st.text_input("Username")
-    l_pass = st.text_input("Password", type="password")
-
-    st.write("✅ render_auth executed")
-
-st.write("✅ STEP 8 - about to choose route")
-
+# 5. Main Application Routing
 if st.session_state.user_id is None:
     render_auth()
-    st.write("✅ STEP 9 - auth page rendered")
 else:
-    st.write("✅ STEP 9 - Logged in")
-
+    # Sidebar Navigation
     with st.sidebar:
-        st.write("✅ STEP 10 - Sidebar started")
-
         st.header("🕵️ ShadowQA Control")
-
-        view = st.radio(
-            "Navigation Matrix",
-            [
-                "ℹ️ Onboarding Hub",
-                "🎯 Chaos Console",
-                "🧠 Root Cause Analyzer",
-                "🕵️‍♂️ Coverage Analyzer",
-                "📊 History & Audits",
-            ],
-        )
-
-    st.write(f"✅ STEP 11 - Selected {view}")
-
-    if view == "ℹ️ Onboarding Hub":
-        st.write("Before onboarding")
-        render_onboarding_hub(GROQ_API_KEY)
-        st.write("After onboarding")
-
-    elif view == "🎯 Chaos Console":
-        st.write("Before chaos")
-        render_chaos_console(GROQ_API_KEY)
-        st.write("After chaos")
-
-    elif view == "🧠 Root Cause Analyzer":
-        st.write("Before RCA")
-        render_root_cause_analyzer(groq_client)
-        st.write("After RCA")
-
-    elif view == "🕵️‍♂️ Coverage Analyzer":
-        st.write("Before Coverage")
-        render_coverage_analyzer(groq_client)
-        st.write("After Coverage")
-
-    elif view == "📊 History & Audits":
-        st.write("Before History")
-        render_history_audit()
-        st.write("After History")
-
-    st.success("✅ STEP 12 - Finished")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import streamlit as st
-# import os
-# from dotenv import load_dotenv
-# from groq import Groq
-
-# # Import our newly modularized components
-# from database.db import init_db, authenticate_user, register_user
-# from ui.tabs import (
-#     render_onboarding_hub,
-#     render_chaos_console,
-#     render_root_cause_analyzer,
-#     render_coverage_analyzer,
-#     render_history_audit
-# )
-
-# # 1. Page Configuration (Must be the absolute first Streamlit command)
-# st.set_page_config(page_title="ShadowQA Suite", page_icon="🕵️", layout="wide")
-
-# # 2. Environment & Database Initialization
-# load_dotenv()
-# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-# @st.cache_resource
-# def initialize_system():
-#     init_db()  # Creates the SQLite file and tables if they don't exist
-#     return Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
-
-# groq_client = initialize_system()
-
-# # 3. Session State Management (The memory bridge between tabs)
-# if "user_id" not in st.session_state:
-#     st.session_state.user_id = None
-# if "generated_tests" not in st.session_state:
-#     st.session_state.generated_tests = []
-# if "last_execution_error" not in st.session_state:
-#     st.session_state.last_execution_error = ""
-
-# # 4. Authentication Barrier (Acts as your ui/auth.py component)
-# def render_auth():
-#     st.title("🔐 ShadowQA Security Gateway")
-#     st.write("---")
-    
-#     col1, col2, col3 = st.columns([1, 2, 1])
-#     with col2:
-#         tab1, tab2 = st.tabs(["Operator Login", "Request Clearance (Register)"])
-        
-#         with tab1:
-#             l_user = st.text_input("Username", key="login_user")
-#             l_pass = st.text_input("Password", type="password", key="login_pass")
-#             if st.button("Authenticate", use_container_width=True):
-#                 user_id = authenticate_user(l_user, l_pass)
-#                 if user_id:
-#                     st.session_state.user_id = user_id
-#                     st.rerun()
-#                 else:
-#                     st.error("Invalid credentials. Access denied.")
-                    
-#         with tab2:
-#             r_user = st.text_input("New Username", key="reg_user")
-#             r_pass = st.text_input("New Password", type="password", key="reg_pass")
-#             if st.button("Register Identity", use_container_width=True):
-#                 if r_user and r_pass:
-#                     if register_user(r_user, r_pass):
-#                         st.success("Identity registered! You may now switch to the Login tab.")
-#                     else:
-#                         st.error("Username already exists in the system registry.")
-#                 else:
-#                     st.warning("Please provide both a username and password.")
-
-# # 5. Main Application Routing
-# if st.session_state.user_id is None:
-#     render_auth()
-# else:
-#     # Sidebar Navigation
-#     with st.sidebar:
-#         st.header("🕵️ ShadowQA Control")
-#         st.caption(f"Active Operator ID: {st.session_state.user_id}")
-#         if st.button("Log Out", use_container_width=True):
-#             st.session_state.user_id = None
-#             st.rerun()
+        st.caption(f"Active Operator ID: {st.session_state.user_id}")
+        if st.button("Log Out", use_container_width=True):
+            st.session_state.user_id = None
+            st.rerun()
             
-#         st.markdown("---")
-#         view = st.radio("Navigation Matrix", [
-#             "ℹ️ Onboarding Hub",
-#             "🎯 Chaos Console",
-#             "🧠 Root Cause Analyzer",
-#             "🕵️‍♂️ Coverage Analyzer",
-#             "📊 History & Audits"
-#         ])
+        st.markdown("---")
+        view = st.radio("Navigation Matrix", [
+            "ℹ️ Onboarding Hub",
+            "🎯 Chaos Console",
+            "🧠 Root Cause Analyzer",
+            "🕵️‍♂️ Coverage Analyzer",
+            "📊 History & Audits"
+        ])
 
-#     # View Router (Injects the UI components we built earlier)
-#     if view == "ℹ️ Onboarding Hub":
-#         render_onboarding_hub(GROQ_API_KEY)
-#     elif view == "🎯 Chaos Console":
-#         render_chaos_console(GROQ_API_KEY)
-#     elif view == "🧠 Root Cause Analyzer":
-#         render_root_cause_analyzer(groq_client)
-#     elif view == "🕵️‍♂️ Coverage Analyzer":
-#         render_coverage_analyzer(groq_client) 
-#     elif view == "📊 History & Audits":
-#         render_history_audit()
+    # View Router (Injects the UI components we built earlier)
+    if view == "ℹ️ Onboarding Hub":
+        render_onboarding_hub(GROQ_API_KEY)
+    elif view == "🎯 Chaos Console":
+        render_chaos_console(GROQ_API_KEY)
+    elif view == "🧠 Root Cause Analyzer":
+        render_root_cause_analyzer(groq_client)
+    elif view == "🕵️‍♂️ Coverage Analyzer":
+        render_coverage_analyzer(groq_client) 
+    elif view == "📊 History & Audits":
+        render_history_audit()
 
