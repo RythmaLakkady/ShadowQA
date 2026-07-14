@@ -1,3 +1,29 @@
+import streamlit as st
+import os
+from dotenv import load_dotenv
+from database.db import *
+from core.llm_engine import generate_test_vectors
+from core.test_runner import run_tests
+from core.coverage import (
+    parse_postman_collection,
+    parse_pytest_script,
+    evaluate_shadow_zones,
+)
+from core.rag_engine import (
+    chunk_document,
+    init_vector_db,
+    analyze_error_with_rag,
+)
+
+
+load_dotenv()
+st.set_page_config(page_title="Test")
+st.success("Everything imported successfully")
+
+
+
+
+
 # import streamlit as st
 # import os
 # from dotenv import load_dotenv
@@ -100,9 +126,3 @@
 #     elif view == "📊 History & Audits":
 #         render_history_audit()
 
-import streamlit as st
-
-import ui.tabs
-
-st.set_page_config(page_title="Test")
-st.success("Tabs imported successfully")
