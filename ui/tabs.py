@@ -1,5 +1,7 @@
 import streamlit as st
 import time
+import pandas as pd
+import json
 
 from core.llm_engine import generate_test_vectors
 from core.test_runner import run_tests
@@ -228,7 +230,13 @@ def render_chaos_console(backend_api_key):
                 f"{results['avg_latency']} ms",
             )
 
-            st.json(results["executed_results"])
+            display_df = pd.DataFrame(st.session_state.generated_tests)
+
+display_df["payload"] = display_df["payload"].apply(
+    lambda x: json.dumps(x, indent=2)
+)
+
+st.dataframe(display_df, use_container_width=True)
 
 def render_root_cause_analyzer(groq_client):
     st.title("🧠 AI Root Cause Analyzer")
