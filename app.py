@@ -100,9 +100,10 @@
 #     elif view == "📊 History & Audits":
 #         render_history_audit()
 
+
+
 import streamlit as st
+from database.db import *
 
-st.set_page_config(page_title="ShadowQA Test")
-
-st.title("ShadowQA")
-st.success("Hello! Streamlit is working.")
+st.set_page_config(page_title="Test")
+st.success("DB OK")
