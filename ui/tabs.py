@@ -229,7 +229,6 @@ def render_chaos_console(backend_api_key):
             )
 
             st.json(results["executed_results"])
-            )
 
 def render_root_cause_analyzer(groq_client):
     st.title("🧠 AI Root Cause Analyzer")
