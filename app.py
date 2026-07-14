@@ -1,6 +1,9 @@
 import streamlit as st
 import os
 from dotenv import load_dotenv
+
+load_dotenv()
+
 from database.db import *
 from core.llm_engine import generate_test_vectors
 from core.test_runner import run_tests
@@ -15,11 +18,8 @@ from core.rag_engine import (
     analyze_error_with_rag,
 )
 
-
-load_dotenv()
 st.set_page_config(page_title="Test")
 st.success("Everything imported successfully")
-
 
 
 
