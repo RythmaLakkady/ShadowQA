@@ -100,7 +100,6 @@
 #     elif view == "📊 History & Audits":
 #         render_history_audit()
 
-
 import streamlit as st
 
 from database.db import *
