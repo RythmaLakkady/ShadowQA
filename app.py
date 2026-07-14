@@ -24,7 +24,7 @@ st.session_state.user_id = 1
 
 st.write("Before onboarding")
 
-render_onboarding_hub(GROQ_API_KEY)
+render_chaos_console(GROQ_API_KEY)
 
 st.write("After onboarding")
 
