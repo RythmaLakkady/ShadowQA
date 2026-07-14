@@ -104,6 +104,8 @@
 
 import streamlit as st
 from database.db import *
+from core.llm_engine import generate_test_vectors
 
 st.set_page_config(page_title="Test")
 st.success("DB OK")
+
