@@ -231,9 +231,8 @@ def render_chaos_console(backend_api_key):
             )
 
             display_df = pd.DataFrame(st.session_state.generated_tests)
-
-display_df["payload"] = display_df["payload"].apply(
-    lambda x: json.dumps(x, indent=2)
+            display_df["payload"] = display_df["payload"].apply(
+            lambda x: json.dumps(x, indent=2)
 )
 
 st.dataframe(display_df, use_container_width=True)
