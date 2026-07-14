@@ -3,31 +3,22 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-st.set_page_config(page_title="Test")   # MUST BE FIRST
+from database.db import init_db
+
+st.set_page_config(page_title="Test")
 
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-groq_client = Groq(api_key=GROQ_API_KEY)
 
-st.write("Groq client created")
-st.write(GROQ_API_KEY is not None)
+@st.cache_resource
+def initialize_system():
+    init_db()
+    return Groq(api_key=GROQ_API_KEY)
 
-from database.db import *
-from core.llm_engine import generate_test_vectors
-from core.test_runner import run_tests
-from core.coverage import (
-    parse_postman_collection,
-    parse_pytest_script,
-    evaluate_shadow_zones,
-)
-from core.rag_engine import (
-    chunk_document,
-    init_vector_db,
-    analyze_error_with_rag,
-)
+groq_client = initialize_system()
 
-st.success("Everything imported successfully")
+st.success("initialize_system works")
 
 
 
