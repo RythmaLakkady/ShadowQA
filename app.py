@@ -8,6 +8,9 @@ st.set_page_config(page_title="Test")   # MUST BE FIRST
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+groq_client = Groq(api_key=GROQ_API_KEY)
+
+st.write("Groq client created")
 st.write(GROQ_API_KEY is not None)
 
 from database.db import *
