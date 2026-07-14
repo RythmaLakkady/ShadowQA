@@ -105,6 +105,12 @@ import streamlit as st
 from database.db import *
 from core.llm_engine import generate_test_vectors
 from core.test_runner import run_tests
+from core.coverage import (
+    parse_postman_collection,
+    parse_pytest_script,
+    evaluate_shadow_zones,
+)
 
 st.set_page_config(page_title="Test")
 st.success("DB + LLM + Runner OK")
+st.success("DB + LLM + Runner + Coverage OK")
