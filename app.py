@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 from groq import Groq
 
 from database.db import init_db
-from ui.tabs import render_onboarding_hub
+from ui.tabs import render_chaos_console
 
-st.set_page_config(page_title="Test")
+st.set_page_config(page_title="Chaos Test")
 
 load_dotenv()
 
@@ -19,16 +19,35 @@ def initialize_system():
 
 groq_client = initialize_system()
 
-# Fake login
 st.session_state.user_id = 1
 
-st.write("Before onboarding")
+st.write("Before chaos")
 
 render_chaos_console(GROQ_API_KEY)
 
-st.write("After onboarding")
+st.write("After chaos")
 
-st.success("Onboarding finished")
+st.success("Chaos finished")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # import streamlit as st
 # import os
