@@ -102,6 +102,7 @@
 
 
 import streamlit as st
+
 from database.db import *
 from core.llm_engine import generate_test_vectors
 from core.test_runner import run_tests
@@ -110,7 +111,11 @@ from core.coverage import (
     parse_pytest_script,
     evaluate_shadow_zones,
 )
+from core.rag_engine import (
+    chunk_document,
+    init_vector_db,
+    analyze_error_with_rag,
+)
 
 st.set_page_config(page_title="Test")
-st.success("DB + LLM + Runner OK")
-st.success("DB + LLM + Runner + Coverage OK")
+st.success("Everything imported successfully")
