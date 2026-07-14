@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
+st.set_page_config(page_title="Test")   # MUST BE FIRST
+
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -22,9 +24,7 @@ from core.rag_engine import (
     analyze_error_with_rag,
 )
 
-st.set_page_config(page_title="Test")
 st.success("Everything imported successfully")
-
 
 
 
