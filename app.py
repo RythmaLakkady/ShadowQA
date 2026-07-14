@@ -80,7 +80,52 @@ if st.session_state.user_id is None:
     render_auth()
     st.write("✅ STEP 9 - auth page rendered")
 else:
-    st.write("Logged in")
+    st.write("✅ STEP 9 - Logged in")
+
+    with st.sidebar:
+        st.write("✅ STEP 10 - Sidebar started")
+
+        st.header("🕵️ ShadowQA Control")
+
+        view = st.radio(
+            "Navigation Matrix",
+            [
+                "ℹ️ Onboarding Hub",
+                "🎯 Chaos Console",
+                "🧠 Root Cause Analyzer",
+                "🕵️‍♂️ Coverage Analyzer",
+                "📊 History & Audits",
+            ],
+        )
+
+    st.write(f"✅ STEP 11 - Selected {view}")
+
+    if view == "ℹ️ Onboarding Hub":
+        st.write("Before onboarding")
+        render_onboarding_hub(GROQ_API_KEY)
+        st.write("After onboarding")
+
+    elif view == "🎯 Chaos Console":
+        st.write("Before chaos")
+        render_chaos_console(GROQ_API_KEY)
+        st.write("After chaos")
+
+    elif view == "🧠 Root Cause Analyzer":
+        st.write("Before RCA")
+        render_root_cause_analyzer(groq_client)
+        st.write("After RCA")
+
+    elif view == "🕵️‍♂️ Coverage Analyzer":
+        st.write("Before Coverage")
+        render_coverage_analyzer(groq_client)
+        st.write("After Coverage")
+
+    elif view == "📊 History & Audits":
+        st.write("Before History")
+        render_history_audit()
+        st.write("After History")
+
+    st.success("✅ STEP 12 - Finished")
 
 
 
