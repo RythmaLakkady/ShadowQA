@@ -101,12 +101,10 @@
 #         render_history_audit()
 
 
-
 import streamlit as st
 from database.db import *
 from core.llm_engine import generate_test_vectors
 from core.test_runner import run_tests
 
 st.set_page_config(page_title="Test")
-st.success("DB OK")
-
+st.success("DB + LLM + Runner OK")
