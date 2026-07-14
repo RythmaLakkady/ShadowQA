@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-from database.db import init_db
+from database.db import init_db, authenticate_user, register_user
 
 st.set_page_config(page_title="Test")
 
@@ -18,8 +18,19 @@ def initialize_system():
 
 groq_client = initialize_system()
 
-st.success("initialize_system works")
+if "user_id" not in st.session_state:
+    st.session_state.user_id = None
 
+
+def render_auth():
+    st.title("Login Test")
+    st.text_input("Username")
+    st.text_input("Password", type="password")
+
+
+render_auth()
+
+st.success("render_auth finished")
 
 
 # import streamlit as st
