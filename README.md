@@ -1,6 +1,9 @@
 <h1 align="center">🛡️ ShadowQA</h1>
 
 <p align="center">
+  <img src="shadowqa.gif" alt="ShadowQA Demo" />
+</p>
+<p align="center">
 <b>AI-Powered API Testing & Debugging Framework</b>
 </p>
 
