@@ -23,7 +23,7 @@ async def execute_concurrent_tests(tests, target_url, http_method):
         tasks = [fetch(client, http_method, target_url, test.get('payload', {})) for test in tests]
         return await asyncio.gather(*tasks)
 
-def run_tests(test_cases, target_url, http_method, user_id):
+def run_tests(test_cases, target_url, http_method, user_id, schema_text=None):
     """Main execution loop bridging async performance with Streamlit's sync generator."""
     total_vectors = len(test_cases)
     if total_vectors == 0:
@@ -85,7 +85,7 @@ def run_tests(test_cases, target_url, http_method, user_id):
     timestamp_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     # Commit to SQLite
-    save_test_session(user_id, target_url, timestamp_str, vulnerability_rate, executed_results)
+    save_test_session(user_id, target_url, timestamp_str, vulnerability_rate, executed_results, schema_text)
     
     # Yield final metrics dashboard
     yield {

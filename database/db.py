@@ -29,9 +29,16 @@ def init_db():
             target_url TEXT NOT NULL,
             timestamp TEXT NOT NULL,
             vulnerability_rate REAL NOT NULL,
+            schema_text TEXT,
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     """)
+    
+    # Safely try to add schema_text column if migrating from an older DB
+    try:
+        cursor.execute("ALTER TABLE test_sessions ADD COLUMN schema_text TEXT")
+    except sqlite3.OperationalError:
+        pass # Column already exists
     
     # Test Results table
     cursor.execute("""
@@ -49,35 +56,29 @@ def init_db():
     conn.commit()
     conn.close()
 
-def hash_password(password):
-    """Simple, clean SHA-256 password hashing to avoid heavy external binary dependencies."""
-    return hashlib.sha256(password.encode()).hexdigest()
-
-def register_user(username, password):
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hash_password(password)))
-        conn.commit()
-        conn.close()
-        return True
-    except sqlite3.IntegrityError:
-        return False
-
-def authenticate_user(username, password):
+def get_or_create_user(username):
+    """Automatically fetches or creates a user for seamless workspace separation without passwords."""
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id FROM users WHERE username = ? AND password = ?", (username, hash_password(password)))
+    cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
     user = cursor.fetchone()
+    if user:
+        conn.close()
+        return user[0]
+    
+    # Insert with a dummy password since the schema requires it
+    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, "NOPASS"))
+    user_id = cursor.lastrowid
+    conn.commit()
     conn.close()
-    return user[0] if user else None
+    return user_id
 
-def save_test_session(user_id, target_url, timestamp_str, vulnerability_rate, executed_results):
+def save_test_session(user_id, target_url, timestamp_str, vulnerability_rate, executed_results, schema_text=None):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO test_sessions (user_id, target_url, timestamp, vulnerability_rate) VALUES (?, ?, ?, ?)",
-        (user_id, target_url, timestamp_str, vulnerability_rate)
+        "INSERT INTO test_sessions (user_id, target_url, timestamp, vulnerability_rate, schema_text) VALUES (?, ?, ?, ?, ?)",
+        (user_id, target_url, timestamp_str, vulnerability_rate, schema_text)
     )
     session_id = cursor.lastrowid
     
@@ -93,7 +94,16 @@ def save_test_session(user_id, target_url, timestamp_str, vulnerability_rate, ex
 def get_test_sessions(user_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, target_url, timestamp, vulnerability_rate FROM test_sessions WHERE user_id = ? ORDER BY id DESC", (user_id,))
+    cursor.execute("SELECT id, target_url, timestamp, vulnerability_rate, schema_text FROM test_sessions WHERE user_id = ? ORDER BY id DESC", (user_id,))
+    sessions = cursor.fetchall()
+    conn.close()
+    return sessions
+
+def get_all_test_sessions():
+    conn = get_connection()
+    cursor = conn.cursor()
+    # Fetch all sessions regardless of user ID for the global analyzer dropdown
+    cursor.execute("SELECT id, target_url, timestamp, vulnerability_rate, schema_text FROM test_sessions ORDER BY id DESC")
     sessions = cursor.fetchall()
     conn.close()
     return sessions

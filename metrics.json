@@ -1,0 +1,93 @@
+{
+  "code_metrics": {
+    "python_files": 11,
+    "modules": 11,
+    "classes": 0,
+    "functions": 44,
+    "non_comment_loc": 1129,
+    "total_function_length": 1270,
+    "average_function_length": 28.86
+  },
+  "benchmarks": [
+    {
+      "name": "Application Startup",
+      "runs": 1,
+      "mean_ms": 11326.99
+    },
+    {
+      "name": "Postman JSON Parsing",
+      "runs": 20,
+      "mean_ms": 0.03,
+      "median_ms": 0.02,
+      "min_ms": 0.02,
+      "max_ms": 0.07,
+      "std_dev_ms": 0.01,
+      "p95_ms": 0.03
+    },
+    {
+      "name": "ChromaDB RAG Indexing",
+      "runs": 3,
+      "mean_ms": 138.46,
+      "median_ms": 130.12,
+      "min_ms": 126.61,
+      "max_ms": 158.66,
+      "std_dev_ms": 17.58,
+      "p95_ms": 130.12
+    },
+    {
+      "name": "SQLite Register & Save Session",
+      "runs": 10,
+      "mean_ms": 26.05,
+      "median_ms": 25.8,
+      "min_ms": 22.5,
+      "max_ms": 29.8,
+      "std_dev_ms": 2.57,
+      "p95_ms": 29.75
+    },
+    {
+      "name": "Async HTTP Execution (3 Payloads)",
+      "runs": 5,
+      "mean_ms": 14394.7,
+      "median_ms": 13811.87,
+      "min_ms": 11523.49,
+      "max_ms": 17517.86,
+      "std_dev_ms": 2993.7,
+      "p95_ms": 17514.5
+    },
+    {
+      "name": "Groq LLM Prompting & Test Generation",
+      "runs": 2,
+      "mean_ms": 1795.79,
+      "median_ms": 1795.79,
+      "min_ms": 1642.5,
+      "max_ms": 1949.08,
+      "std_dev_ms": 216.79,
+      "p95_ms": 1642.5
+    },
+    {
+      "name": "Groq RAG Error Diagnostic Inference",
+      "runs": 2,
+      "mean_ms": 1132.01,
+      "median_ms": 1132.01,
+      "min_ms": 939.02,
+      "max_ms": 1325.01,
+      "std_dev_ms": 272.94,
+      "p95_ms": 939.02
+    },
+    {
+      "name": "Groq LLM Coverage Report Generation",
+      "runs": 2,
+      "mean_ms": 1071.84,
+      "median_ms": 1071.84,
+      "min_ms": 994.89,
+      "max_ms": 1148.8,
+      "std_dev_ms": 108.83,
+      "p95_ms": 994.89
+    },
+    {
+      "name": "Total End-to-End Runtime Estimate",
+      "runs": 1,
+      "mean_ms": 29885.87
+    }
+  ]
+}

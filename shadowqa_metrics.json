@@ -1,0 +1,17 @@
+{
+  "codebase": {
+    "files": 10,
+    "loc": 966
+  },
+  "benchmark": {
+    "total_endpoints": 20,
+    "successful": 14,
+    "wall_time_ms": 9612.8,
+    "wall_time_s": 9.61,
+    "avg_latency_ms": 1984.8,
+    "p95_latency_ms": 2562.9,
+    "min_latency_ms": 1283.5,
+    "max_latency_ms": 2677.5
+  },
+  "rag": null
+}
