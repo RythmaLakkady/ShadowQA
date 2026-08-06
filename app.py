@@ -42,12 +42,24 @@ if "last_execution_error" not in st.session_state:
 # 4. Main Application Routing
 # Sidebar Navigation
 with st.sidebar:
-    st.header("🕵️ ShadowQA Control")
+    st.image("https://img.icons8.com/color/48/000000/ninja.png", width=30)
+    st.markdown("### ShadowQA Control")
     st.caption("System active and monitoring.")
+    st.write("---")
     
-    # Passwordless Workspace Separation
-    operator_name = st.text_input("Active Operator Workspace", value="Default Operator")
-    st.session_state.user_id = get_or_create_user(operator_name)
+    raw_workspace = st.text_input(
+        "Active Operator Workspace", 
+        value="Default Operator",
+        max_chars=50
+    )
+    
+    # Sanitize input: allow only alphanumeric, spaces, and underscores
+    import re
+    workspace_name = re.sub(r'[^a-zA-Z0-9 _-]', '', raw_workspace)
+    if not workspace_name.strip():
+        workspace_name = "Default Operator"
+        
+    st.session_state.user_id = get_or_create_user(workspace_name)
         
     st.markdown("---")
     view = st.radio("Navigation Matrix", [

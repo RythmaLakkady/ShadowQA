@@ -19,6 +19,22 @@ async def fetch(client, method, url, payload):
 
 async def execute_concurrent_tests(tests, target_url, http_method):
     """Fires all test vectors at the exact same time."""
+    
+    # Strict SSRF Protection at the execution layer
+    import urllib.parse
+    parsed_url = urllib.parse.urlparse(target_url)
+    
+    # Block non-HTTP protocols
+    if parsed_url.scheme not in ['http', 'https']:
+        raise Exception(f"Security Policy Violation: Protocol '{parsed_url.scheme}' is not allowed.")
+        
+    # Block internal, private, and loopback IPs
+    # Note: Streamlit runs on localhost, if we allow localhost here, a user could theoretically
+    # trigger API actions against Streamlit itself or other local services on the server.
+    restricted_domains = ['localhost', '127.0.0.1', '0.0.0.0', '169.254.169.254']
+    if any(domain in parsed_url.hostname for domain in restricted_domains):
+        raise Exception("Security Policy Violation: Accessing local or internal IP addresses is strictly prohibited.")
+        
     async with httpx.AsyncClient() as client:
         tasks = [fetch(client, http_method, target_url, test.get('payload', {})) for test in tests]
         return await asyncio.gather(*tasks)

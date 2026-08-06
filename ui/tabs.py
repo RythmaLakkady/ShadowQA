@@ -77,11 +77,26 @@ def render_chaos_console(backend_api_key):
 
     with col2:
         api_desc = st.text_area(
-            "API Description / Required JSON Schema Rules",
+            "API Description / Required JSON Schema Rules", 
+            height=150,
+            max_chars=15000,
+            help="Describe the endpoint structure, required fields, data types, and any constraints. Max 15,000 characters.",
             value="Expects a JSON payload containing: title, body and userId."
         )
 
-    if st.button("💥 Initialize AI Generation Matrix", use_container_width=True):
+    if st.button("Generate AI Chaos Tests", use_container_width=True, type="primary"):
+        if not target_url or not target_url.startswith(("http://", "https://")):
+            st.warning("Please enter a valid Target API Endpoint URL starting with http:// or https://")
+            return
+            
+        if "localhost" in target_url or "127.0.0.1" in target_url or "169.254" in target_url:
+            st.error("Access to local or internal metadata addresses is prohibited for security reasons.")
+            return
+
+        if not api_desc:
+            st.warning("Please provide an API description/schema.")
+            return
+
         if not backend_api_key:
             time.sleep(1)
             st.session_state.generated_tests = [
@@ -232,6 +247,8 @@ def render_root_cause_analyzer(groq_client):
         "Paste Error Log / Stack Trace",
         value=default_text,
         height=180,
+        max_chars=10000,
+        help="Paste the full error log, stack trace, or failed response here. Max 10,000 characters."
     )
 
     if st.button("🔍 Run AI Automated Diagnostics", type="primary", use_container_width=True):
