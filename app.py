@@ -20,9 +20,11 @@ st.set_page_config(page_title="ShadowQA Suite", page_icon="🕵️", layout="wid
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+# Run db initialization on every script run (outside of cache) to ensure schema migrations apply on hot-reload
+init_db()  
+
 @st.cache_resource
 def initialize_system():
-    init_db()  # Creates the SQLite file and tables if they don't exist
     return Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 groq_client = initialize_system()
