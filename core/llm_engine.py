@@ -45,7 +45,7 @@ def generate_test_vectors(target_url, http_method, api_desc, backend_api_key):
         "Content-Type": "application/json"
     }
     payload_data = {
-        "model": "llama-3.3-70b-versatile",
+        "model": "llama3-70b-8192",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}

@@ -51,7 +51,7 @@ def analyze_error_with_rag(
     error_log: str,
     retriever,
     groq_client,
-    model_name="llama-3.3-70b-versatile",
+    model_name="llama3-70b-8192",
 ):
     """
     Queries the vector database for relevant API context

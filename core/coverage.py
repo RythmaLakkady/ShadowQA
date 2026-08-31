@@ -44,7 +44,7 @@ def parse_pytest_script(file_content: str):
         
     return list(set(endpoints))
 
-def evaluate_shadow_zones(schema_text: str, extracted_tests: list, groq_client, model_name="llama-3.3-70b-versatile"):
+def evaluate_shadow_zones(schema_text: str, extracted_tests: list, groq_client, model_name="llama3-70b-8192"):
     """
     Passes the API schema and the found test endpoints to the LLM to identify coverage gaps.
     """
