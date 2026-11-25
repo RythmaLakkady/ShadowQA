@@ -3,7 +3,7 @@
 <p align="center">
 <b>AI-Powered API Testing & Debugging Framework</b>
 </p>
-
+<p> OFF CAMPUS by aws CODE : 9C5WBE </p>
 <p align="center">
 Generate intelligent API test cases from OpenAPI specifications, execute them concurrently against REST endpoints, and analyze failures using Retrieval-Augmented Generation (RAG).
 </p>
